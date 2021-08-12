@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <title>Storage Layout Mapper Page</title>
+        <link rel="stylesheet" href="/src/SLM-styles.css">
+        <style>
+            body {
+                background-color:black;
+                color: white;
+            }
+        </style>
+        <!-- <base href="https://AvengerMoJo.github.io/" target="_blank"> -->
+        <meta charset="UTF-8">
+        <meta name="description" content="Storage Layout Mapping tool.">
+        <meta name="keywords" content="AvengerMoJo, Storage, Layout, Mapping">
+        <meta name="author" content="AvengerMoJo">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="module" src="/src/svg-layoutmapper.ts"></script>
+    </head>
+    <body>
+    <h1>Storage Drive Layout Configurator</h1>
+    <div class='setting' id='setting'>
+        <div class="BoxType">
+            <select name='BoxType' id='BoxType'>
+                <option value='Rackmount'>Rackmount</option>
+                <option value='Tower'>Tower</option>
+                <option value='Others'>Others</option>
+            </select>
+        </div>
+        <div class="ServerHeight">
+            <p>Server Height: <span id="ServerHeightU"></span>U</p>
+            <input width=100% type="range" min="1" max="42" value="1" class="slider" id="ServerHeight">
+            <script>
+            var server_height_slider = document.getElementById("ServerHeight");
+            var server_height_output = document.getElementById("ServerHeightU");
+            server_height_output.innerHTML = server_height_slider.value;
+            server_height_slider.oninput = function() {
+                server_height_output.innerHTML = this.value;
+            }
+            </script>
+        </div>
+        <div class="DriveRow">
+            <p>Drive Row Number: <span id="DriveRowNum"></span> Row</p>
+            <input width=100% type="range" min="1" max="42" value="1" class="slider" id="DriveRow">
+            <script>
+            var driver_row_slider = document.getElementById("DriveRow");
+            var driver_row_output = document.getElementById("DriveRowNum");
+            driver_row_output.innerHTML = driver_row_slider.value;
+            driver_row_slider.oninput = function() {
+                driver_row_output.innerHTML = this.value;
+            }
+            </script>
+        </div>
+        <div class="DriveCol">
+            <p>Drive Column Number: <span id="DriveColNum"></span> Column</p>
+            <input width=100% type="range" min="1" max="42" value="1" class="slider" id="DriveCol">
+            <script>
+            var driver_col_slider = document.getElementById("DriveCol");
+            var driver_col_output = document.getElementById("DriveColNum");
+            driver_col_output.innerHTML = driver_col_slider.value;
+            driver_col_slider.oninput = function() {
+                driver_col_output.innerHTML = this.value;
+            }
+            </script>
+        </div>
+        <div class="TotalDrive">
+            <p>Total Drive Number: <span id="TotalDriveNum"></span> Drive</p>
+            <input width=100% type="range" min="1" max="60" value="1" class="slider" id="TotalDrive">
+            <script>
+            var total_driver_slider = document.getElementById("TotalDrive");
+            var total_driver_output = document.getElementById("TotalDriveNum");
+            total_driver_output.innerHTML = total_driver_slider.value;
+            total_driver_slider.oninput = function() {
+                total_driver_output.innerHTML = this.value;
+            }
+            </script>
+        </div>
+        <div class="DriveType">
+            <select name='DriveType' id='DriveType'>
+                <option value="3.5' HDD">3.5' HDD</option>
+                <option value="2.5' HDD">2.5' HDD</option>
+                <option value="2.5' HDD">2.5' SSD</option>
+                <option value='NVMe'>NVMe</option>
+            </select>
+        </div>
+        <div class="DriveOrientation">
+            <select name='DriveOrientation' id='DriveOrientation'>
+                <option value='Vertical'>Vertical</option>
+                <option value='Horizontal'>Horizontal</option>
+                <option value='Others'>Others</option>
+            </select>
+        </div>
+        <div id="Draw" class="Draw">
+            <button onclick="window.call()">Draw</button>
+            <script>
+                function call() {
+                    clear(draw);
+                    boxtype = document.getElementById("BoxType").value;
+                    server_u = document.getElementById("ServerHeight").value;
+                    drive_row = document.getElementById("DriveRow").value;
+                    drive_col = document.getElementById("DriveCol").value;
+                    drive_slot = document.getElementById("TotalDrive").value;
+                    drive_type = document.getElementById("DriveType").value;
+                    direction = document.getElementById("DriveOrientation").value;
+                    drawDriveLayout(draw, boxtype, server_u, drive_row, drive_col, drive_slot, drive_type, direction, 50, 50);
+                }
+            </script>
+            <div id="Download" class="Download">
+                <input width=100% type="text" min="1" max="60" value="sample.svg" class="Filename" id="Filename">
+                <button onclick="window.download()">Download</button>
+                <script>
+                    function download() {
+                        var filename = document.getElementById("Filename").value;
+                        downloadString( draw.svg(), "text/csv", filename);
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+    <div id='box' class='box'></div>
+    </body>
+</html>
+

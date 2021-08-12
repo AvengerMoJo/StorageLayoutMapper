@@ -1,0 +1,14 @@
+div.setting {
+  position: relative;
+  top: 10;
+  Left: 10;
+  width: 500px;
+  height: 500px;
+}
+
+div.box {
+  background-color: white;
+  position: relative;
+  top: 10;
+}
+
