@@ -13,7 +13,8 @@ declare global {
     }
 }
 
-let draw = SVG().addTo('#box').size(700,700);
+//let draw = SVG().addTo('#box').size(700,700);
+let draw = SVG().addTo('#box')
 
 window.clear = clear;
 window.downloadString = downloadString;
@@ -58,7 +59,9 @@ let server = new Server( 'Example', BoxType.Rackmount, 2, 24, 1, 24, ssd_type, S
 // let server = new Server( 'Node4', BoxType.Rackmount, 2, 24, 3, 4, hdd_type, SlotOrientation.Horizontal);
 // let server = new Server( 'Node5', BoxType.Rackmount, 1, 16, 1, 4, hdd_type, SlotOrientation.Horizontal);
 // let server = new Server( 'Node6', BoxType.Tower, 3, 16, 4, 4, hdd_type, SlotOrientation.Vertical);
-draw.add( server.getSVG().move(50,50) );
+draw.add( server.getSVG().move(5,5) );
+draw.size(server.width+10, server.height+10);
+// draw.size(700,700)
 
 
 function drawDriveLayout( svg: any, server_name: string,
@@ -69,6 +72,7 @@ function drawDriveLayout( svg: any, server_name: string,
     let server = new Server( server_name, server_type, server_unit, drive_slot,
     drive_row, drive_col, drives_type, slot_type);
     svg.add( server.getSVG().move(pic_move_x, pic_move_y) );
+    svg.size( 500,500 )
 }
 
 // sample server configuration
