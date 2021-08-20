@@ -1,15 +1,17 @@
-const { resolve } = require('path')
-const srcPath = resolve(__dirname, './src');
+const path = require('path');
 
 module.exports = {
-    alias: {
-        '/@/': resolve(__dirname, './src')
+    resolve: {
+        alias: [
+            {find: "@", replacement: path.resolve(__dirname, 'src')}
+        ],
     },
+    base: 'https://avengermojo.github.io/',
     build: {
         rollupOptions: {
             input: {
-                main: resolve(__dirname, 'index.html'),
-                storage: resolve(__dirname, 'StorageLayoutMapper.html')
+                main: path.resolve(__dirname, 'index.html'),
+                storage: path.resolve(__dirname, 'StorageLayoutMapper.html')
             }
         }
     }

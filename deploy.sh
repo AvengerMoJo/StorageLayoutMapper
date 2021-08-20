@@ -12,7 +12,7 @@ cd dist
 git add -A 
 git commit -s -S -m 'deploy'
 
-git push -f git@github.com:avengermojo/avengermojo.github.io.git master
+git push -f git@github.com:avengermojo/avengermojo.github.io.git main
 
 cd -
 
