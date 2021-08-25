@@ -198,6 +198,17 @@
             </div>
         </div>
     </div>
+        <div id="Json" class="Json">
+            <button onclick="window.jsonview()">JSON-View</button>
+            <script>
+                function jsonview() {
+                    showjson( draw.svg() );
+                }
+            </script>
+            <div id="JsonView" class="JsonView">
+                <pre><code id="jsonstring"></code></pre>
+            </div>
+        </div>
     <div id='box' class='box'></div>
     </body>
 </html>

@@ -2,6 +2,8 @@
 import { DriveType, SlotOrientation } from "./harddrive.ts";
 // @ts-ignore
 import { Server, BoxType } from "./server.ts";
+// @ts-ignore
+import { svgtojson } from "./svgtojson.ts";
 import { SVG } from "@svgdotjs/svg.js";
 
 declare global {
@@ -10,6 +12,7 @@ declare global {
         draw:any;
         drawDriveLayout:any;
         downloadString:any;
+        showjson:any;
     }
 }
 
@@ -20,6 +23,7 @@ window.clear = clear;
 window.downloadString = downloadString;
 window.drawDriveLayout = drawDriveLayout;
 window.draw = draw;
+window.showjson = showjson;
 
 function clear(thedraw:any){
     thedraw.clear()
@@ -72,7 +76,15 @@ function drawDriveLayout( svg: any, server_name: string,
     let server = new Server( server_name, server_type, server_unit, drive_slot,
     drive_row, drive_col, drives_type, slot_type);
     svg.add( server.getSVG().move(pic_move_x, pic_move_y) );
-    svg.size( 500,500 )
+    svg.size( server.width+10, server.height+10);
+}
+
+function showjson( svgstring: string ){
+    let json = svgtojson( svgstring );
+    let jsonview = document.getElementById('jsonstring');
+
+    if( json && jsonview )
+        jsonview.innerHTML = json;
 }
 
 // sample server configuration
