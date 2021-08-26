@@ -45,17 +45,17 @@ export class HardDrive implements HardDriveConfig {
         this.size = size;
         this.width = NVMEX;
         this.height= NVMEY;
-        console.log("HardDrive type creating " + size );
+        // console.log("HardDrive type creating " + size );
         if ( size == DriveType.HDD35 ) {
-            console.log("Find it HardDrive type creating " + size );
+        // console.log("Find it HardDrive type creating " + size );
             this.width = HD35X;
             this.height= HD35Y;
         } else if ( size == DriveType.HDD25 || size == DriveType.SSD25 ) {
-            console.log("Find it HardDrive type creating " + size );
+        //   console.log("Find it HardDrive type creating " + size );
             this.width =HD25X;
             this.height=HD25Y;
         } else {
-            console.log("Find error " + size );
+        //   console.log("Find error " + size );
             this.width =HD25X;
             this.height=HD25Y;
         }

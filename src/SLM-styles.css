@@ -10,7 +10,9 @@ div.setting {
 div.box {
   background-color: white;
   position: relative;
+  width: 600;
   top: 10;
+  overflow: auto;
 }
 
 div.Json{

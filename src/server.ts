@@ -53,8 +53,8 @@ export class Server implements ServerConfig {
         this.hd_slot = hd_slot;
         this.hd_row  = hd_row;
         this.hd_col  = hd_col;
-        this.hd_z    = (hd_slot / ( hd_row * hd_col )) - 1;
-
+        var z_hd_slot= hd_row * hd_col;
+        this.hd_z    = Math.ceil(hd_slot / z_hd_slot)-1;
 
         this.harddrive_list = new Array(this.hd_slot);
         for ( var i = 0; i < this.hd_slot; i++ ){
@@ -106,27 +106,25 @@ export class Server implements ServerConfig {
             decoration.add( SVG().text( '192.168.128.158' ).font({ family: 'Helvetica', size: 12}).build(true).move(5,55));
         }
 
-        var z_hd_slot = this.hd_slot / (this.hd_z+1);
-        console.log( 'Server Height = ' + this.height + ' Width =' + this.width);
-        //var row_gap = Math.floor( (this?.height-this.decoration_y) / this.hd_row)-2;
+        //console.log( 'Server Height = ' + this.height + ' Width =' + this.width);
         var row_gap = Math.floor( (this.height -this.decoration_y) / this.hd_row)-2;
         var col_gap = Math.floor( (this.width-this.decoration_x) / this.hd_col);
 
         for (var z = 0; z < this.hd_z+1; z++) {
-            console.log( 'Hard-Drive Z = ' + z + ' z_hd_slot=' + z_hd_slot );
+            // console.log( 'Hard-Drive Z = ' + z + ' z_hd_slot=' + z_hd_slot );
             let z_group = SVG().group();
 
             let box = SVG().rect(this.width, this.height).fill('none').stroke({color:'#000', width:5}).radius(5);
             let harddrive_group = SVG().group();
 
             for (var r = 0; r < this.hd_row; r++) {
-                console.log( 'Hard-Drive Row = ' + r );
+            // console.log( 'Hard-Drive Row = ' + r );
                 let new_row_group = SVG().group();
-    		    for (var c = 0; c < this.hd_col; c++) {
+                for (var c = 0; c < this.hd_col && (z_hd_slot*z)+(this.hd_col*r+c) < this.hd_slot; c++) {
                     var pos = r * this.hd_col + z * z_hd_slot;
                     var shift_y = this.harddrive_list[pos+c].height + 3;
                     var shift_x = this.harddrive_list[pos+c].width + 3;
-                    console.log( 'Hard-Drive Col = ' + c + ' width=' + shift_x + ' height=' + shift_y );
+                    // console.log( 'Hard-Drive Col = ' + c + ' width=' + shift_x + ' height=' + shift_y );
                     // new_row_group.add( this.harddrive_list[pos+c].getSVG().move(0,-18*c) );
                     if ( orientation === SlotOrientation.Vertical ) {
                         new_row_group.add( this.harddrive_list[pos+c].getSVG().move(0, -col_gap*c) );
@@ -136,7 +134,7 @@ export class Server implements ServerConfig {
                     }
                 }
                 new_row_group.move(this.decoration_x, this.decoration_y + row_gap*r+2);
-                console.log( 'Hard-Drive Row gap = ' + row_gap + ' Col gap = ' + col_gap + ' shift_x=' + shift_x + ' shift_y='+shift_y );
+                //console.log( 'Hard-Drive Row gap = ' + row_gap + ' Col gap = ' + col_gap + ' shift_x=' + shift_x + ' shift_y='+shift_y );
                 harddrive_group.add( new_row_group );
             }
             if( z > 0 ) {

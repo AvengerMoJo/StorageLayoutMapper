@@ -15,6 +15,28 @@
         <meta name="author" content="AvengerMoJo">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script type="module" src="/src/svg-layoutmapper.ts"></script>
+        <script>
+function updateURL() {
+    //const queryString = window.location.search;
+    var server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drive_type, orientation;
+    const params = new URLSearchParams( window.location.search );
+    document.getElementById("ServerModelName").value = server_name = params.get("ServerModelName");
+    document.getElementById("BoxType").value = boxtype = params.get("BoxType");
+    document.getElementById("ServerHeight").value = document.getElementById("ServerHeightSelect").value = server_u = params.get("ServerHeight");
+    document.getElementById("TotalDrive").value = document.getElementById("TotalDriveText").value = drive_slot = params.get("TotalDrive");
+    document.getElementById("DriveRow").value = document.getElementById("DriveRowSelect").value = drive_row = params.get("DriveRow");
+    document.getElementById("DriveCol").value = document.getElementById("DriveColSelect").value = drive_col = params.get("DriveCol");
+    document.getElementById("DriveOrientation").value = orientation = params.get("DriveOrientation");
+    document.getElementById("DriveType").value = drive_type = params.get("DriveType");
+    let drives_type = new Array(drive_slot);
+    for(let i=0; i< drive_slot; i++ ){
+        drives_type[i]= drive_type;
+    }
+    clear(draw);
+    drawDriveLayout(draw, server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drives_type, orientation, 5, 5);
+}
+window.onload=updateURL;
+        </script>
     </head>
     <body>
     <h1>Storage Drive Layout Configurator</h1>
@@ -173,17 +195,33 @@
                     server_name = document.getElementById("ServerModelName").value;
                     boxtype = document.getElementById("BoxType").value;
                     server_u = document.getElementById("ServerHeight").value;
+                    drive_slot = document.getElementById("TotalDrive").value;
                     drive_row = document.getElementById("DriveRow").value;
                     drive_col = document.getElementById("DriveCol").value;
-                    drive_slot = document.getElementById("TotalDrive").value;
                     drive_type = document.getElementById("DriveType").value;
                     drives_type = new Array(drive_slot);
                     for( i=0; i< drive_slot; i++ ){
-                        console.log( "TotalDrive " + drive_slot + "Drive Type =" + drive_type )
+                        // console.log( "TotalDrive " + drive_slot + "Drive Type =" + drive_type )
                         drives_type[i]= drive_type;
                     }
-                    direction = document.getElementById("DriveOrientation").value;
-                    drawDriveLayout(draw, server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drives_type, direction, 5, 5);
+                    orientation = document.getElementById("DriveOrientation").value;
+                    drawDriveLayout(draw, server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drives_type, orientation, 5, 5);
+//window.location.search = "?ServerModelName=" + server_name + "&BoxType=" + boxtype +
+//    "&ServerHeight=" + server_u + "&TotalDrive=" + drive_slot + "&DriveRow=" + drive_row +
+//    "&DriveCol=" + drive_col + "&DriveType=" + drive_type + "&Orientataion=" + orientataion;
+                    const url = new URL( window.location );
+                    url.searchParams.set('ServerModelName', server_name);
+                    url.searchParams.set('BoxType', boxtype);
+                    url.searchParams.set('ServerHeight', server_u);
+                    url.searchParams.set('TotalDrive', drive_slot);
+                    url.searchParams.set('DriveRow', drive_row);
+                    url.searchParams.set('ServerHeight', server_u);
+                    url.searchParams.set('TotalDrive', drive_slot);
+                    url.searchParams.set('DriveRow', drive_row);
+                    url.searchParams.set('DriveCol', drive_col);
+                    url.searchParams.set('DriveType', drive_type);
+                    url.searchParams.set('DriveOrientation', orientation);
+                    window.history.pushState({}, '', url);
                 }
             </script>
             <div id="Download" class="Download">
