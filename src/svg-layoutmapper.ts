@@ -63,6 +63,7 @@ let server = new Server( 'Example', BoxType.Rackmount, 2, 24, 1, 24, ssd_type, S
 // let server = new Server( 'Node5', BoxType.Rackmount, 1, 16, 1, 4, hdd_type, SlotOrientation.Horizontal);
 // let server = new Server( 'Node6', BoxType.Tower, 3, 16, 4, 4, hdd_type, SlotOrientation.Vertical);
 draw.add( server.getSVG().move(5,5) );
+draw.size( server.width+((server.hd_z+1)*10)+10, (server.height*(1+server.hd_z))+10);
 //console.log( "Width = " + (server.width+(server.hd_z*6) +10) + " Height =" + ( server.height*(server.hd_z+2)+10));
 //console.log( "Z level = " +server.hd_z  );
 

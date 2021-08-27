@@ -122,8 +122,8 @@ export class Server implements ServerConfig {
                 let new_row_group = SVG().group();
                 for (var c = 0; c < this.hd_col && (z_hd_slot*z)+(this.hd_col*r+c) < this.hd_slot; c++) {
                     var pos = r * this.hd_col + z * z_hd_slot;
-                    var shift_y = this.harddrive_list[pos+c].height + 3;
-                    var shift_x = this.harddrive_list[pos+c].width + 3;
+                    // var shift_y = this.harddrive_list[pos+c].height + 3;
+                    // var shift_x = this.harddrive_list[pos+c].width + 3;
                     // console.log( 'Hard-Drive Col = ' + c + ' width=' + shift_x + ' height=' + shift_y );
                     // new_row_group.add( this.harddrive_list[pos+c].getSVG().move(0,-18*c) );
                     if ( orientation === SlotOrientation.Vertical ) {

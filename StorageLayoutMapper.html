@@ -18,22 +18,57 @@
         <script>
 function updateURL() {
     //const queryString = window.location.search;
-    var server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drive_type, orientation;
+    var server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drive_type, orientation, drives_type;
+    var server_info_completed = true;
     const params = new URLSearchParams( window.location.search );
-    document.getElementById("ServerModelName").value = server_name = params.get("ServerModelName");
-    document.getElementById("BoxType").value = boxtype = params.get("BoxType");
-    document.getElementById("ServerHeight").value = document.getElementById("ServerHeightSelect").value = server_u = params.get("ServerHeight");
-    document.getElementById("TotalDrive").value = document.getElementById("TotalDriveText").value = drive_slot = params.get("TotalDrive");
-    document.getElementById("DriveRow").value = document.getElementById("DriveRowSelect").value = drive_row = params.get("DriveRow");
-    document.getElementById("DriveCol").value = document.getElementById("DriveColSelect").value = drive_col = params.get("DriveCol");
-    document.getElementById("DriveOrientation").value = orientation = params.get("DriveOrientation");
-    document.getElementById("DriveType").value = drive_type = params.get("DriveType");
-    let drives_type = new Array(drive_slot);
-    for(let i=0; i< drive_slot; i++ ){
-        drives_type[i]= drive_type;
+    if( params.get("ServerModelName") != null ) {
+        document.getElementById("ServerModelName").value = server_name = params.get("ServerModelName");
+    } else {
+        server_info_completed = false;
     }
-    clear(draw);
-    drawDriveLayout(draw, server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drives_type, orientation, 5, 5);
+    if( params.get("BoxType") != null ) {
+        document.getElementById("BoxType").value = boxtype = params.get("BoxType");
+    } else {
+        server_info_completed = false;
+    }
+    if( params.get("ServerHeight") ){
+        document.getElementById("ServerHeight").value = document.getElementById("ServerHeightSelect").value = server_u = params.get("ServerHeight");
+    } else {
+        server_info_completed = false;
+    }
+    if( params.get("TotalDrive") ){
+        document.getElementById("TotalDrive").value = document.getElementById("TotalDriveText").value = drive_slot = params.get("TotalDrive");
+    } else {
+        server_info_completed = false;
+    }
+    if( params.get("DriveRow") ){
+        document.getElementById("DriveRow").value = document.getElementById("DriveRowSelect").value = drive_row = params.get("DriveRow");
+    } else {
+        server_info_completed = false;
+    }
+    if( params.get("DriveCol") ){
+        document.getElementById("DriveCol").value = document.getElementById("DriveColSelect").value = drive_col = params.get("DriveCol");
+    } else {
+        server_info_completed = false;
+    }
+    if( params.get("DriveOrientation") ){
+        document.getElementById("DriveOrientation").value = orientation = params.get("DriveOrientation");
+    } else {
+        server_info_completed = false;
+    }
+    if( params.get("DriveType") ) {
+        document.getElementById("DriveType").value = drive_type = params.get("DriveType");
+        drives_type = new Array(drive_slot);
+        for(let i=0; i< drive_slot; i++ ){
+            drives_type[i]= drive_type;
+        }
+    } else {
+        server_info_completed = false;
+    }
+    if( server_info_completed ) {
+        clear(draw);
+        drawDriveLayout(draw, server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drives_type, orientation, 5, 5);
+    }
 }
 window.onload=updateURL;
         </script>
