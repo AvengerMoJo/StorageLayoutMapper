@@ -72,14 +72,13 @@ function drawDriveLayout( svg: any, server_name: string, server_type: BoxType,
     drive_slot: number, drive_row: number, drive_col: number, drives_type: DriveType[],
     slot_type: SlotOrientation, server_unit?: number, customx?: number, customy?: number,
     pic_move_x?: number, pic_move_y?: number) {
-    var shift_x;
 
     var newserver;
     if( server_type == "Rackmount" || server_type == "Tower" ){
         console.log("Rack and Tower draw!")
         newserver = new Server( server_name, server_type, drive_slot,
         drive_row, drive_col, drives_type, slot_type, server_unit);
-        svg.size(newserver.width+((server.hd_z+1)*6*server_unit)+10, (server.height*(1+server.hd_z))+10);
+        svg.size(newserver.width+((server.hd_z+1)*6*newserver.server_unit)+10, (newserver.height*(1+newserver.hd_z))+10);
     } else if( server_type == "Custom" ) {
         newserver = new Server( server_name, server_type, drive_slot,
         drive_row, drive_col, drives_type, slot_type, undefined, customx, customy);

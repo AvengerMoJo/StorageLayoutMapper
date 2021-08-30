@@ -15,12 +15,12 @@ const U_WIDTH = 550;
 export interface ServerConfig {
     name: string;
     size: BoxType;
-    server_unit: number;
     hd_slot: number;
     hd_row: number;
     hd_col: number,
     hd_z?:   number;
     class_tag?: string;
+    server_unit?: number;
     width?: number;
     height?: number;
     readonly decoration_x?: number;
@@ -31,13 +31,13 @@ export interface ServerConfig {
 export class Server implements ServerConfig {
     name: string;
     readonly size: BoxType;
-    readonly server_unit: number;
     readonly hd_slot: number;
     readonly hd_row:  number;
     readonly hd_col:  number;
     harddrive_list: HardDrive[];
     readonly hd_z?:   number;
     readonly class_tag?: string;
+    readonly server_unit?: number;
     readonly width?: number;
     readonly height?: number;
     readonly decoration_x?: number;
@@ -65,6 +65,7 @@ export class Server implements ServerConfig {
         for ( var i = 0; i < this.hd_slot; i++ ){
             this.harddrive_list[i] = new HardDrive( i, driveType[i], orientation );
         }
+        this.width = this.height = this.decoration_x = this.decoration_y = 0;
         if ( size == BoxType.Rackmount ) {
             if ( server_unit !== undefined ) {
                 this.server_unit = server_unit;
@@ -96,7 +97,6 @@ export class Server implements ServerConfig {
                 this.decoration_y = 100;
             } else {
                 console.log( "Error: Custom BoxType require width and height");
-                return;
             }
         }
 
@@ -162,7 +162,7 @@ export class Server implements ServerConfig {
             }
             z_group.add( box );
             z_group.add( harddrive_group.dmove(5,5) );
-            z_group.move( z * (6 * this.server_unit), (this.hd_z - z) * this.height);
+            z_group.move( z * (this.height / 8), (this.hd_z - z) * this.height);
             this.svg.add(z_group);
         }
     }
