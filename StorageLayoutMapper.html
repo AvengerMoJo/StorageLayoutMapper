@@ -18,7 +18,8 @@
         <script>
 function updateURL() {
     //const queryString = window.location.search;
-    var server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drive_type, orientation, drives_type;
+    var server_name, boxtype, server_u, customx, customy,
+        drive_slot, drive_row, drive_col, drive_type, orientation, drives_type;
     var server_info_completed = true;
     const params = new URLSearchParams( window.location.search );
     if( params.get("ServerModelName") != null ) {
@@ -27,12 +28,23 @@ function updateURL() {
         server_info_completed = false;
     }
     if( params.get("BoxType") != null ) {
+        let shs = document.getElementById("ServerHeightDisplay");
+        let customxy = document.getElementById("CustomXY");
         document.getElementById("BoxType").value = boxtype = params.get("BoxType");
-    } else {
-        server_info_completed = false;
-    }
-    if( params.get("ServerHeight") ){
-        document.getElementById("ServerHeight").value = document.getElementById("ServerHeightSelect").value = server_u = params.get("ServerHeight");
+        if( boxtype == "Custom" ) {
+            document.getElementById("CustomX").value = customx = params.get("CustomX");
+            document.getElementById("CustomY").value = customy = params.get("CustomY");
+            customxy.style.display="initial";
+            shs.style.display = "none";
+        } else if( boxtype == "Rackmount" || boxtype == "Tower" ) {
+            if( params.get("ServerHeight") ){
+                document.getElementById("ServerHeight").value = document.getElementById("ServerHeightSelect").value = server_u = params.get("ServerHeight");
+                shs.style.display = "initial";
+                customxy.style.display="none";
+            } else {
+                server_info_completed = false;
+            }
+        }
     } else {
         server_info_completed = false;
     }
@@ -67,7 +79,14 @@ function updateURL() {
     }
     if( server_info_completed ) {
         clear(draw);
-        drawDriveLayout(draw, server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drives_type, orientation, 5, 5);
+        if( boxtype == "Custom" ) {
+            console.log( "Draw custom box!" );
+            drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
+        }
+        else if ( boxtype == "Rackmount" || boxtype == "Tower" ) {
+            console.log( "Draw rack, tower box!" );
+            drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
+        }
     }
 }
 window.onload=updateURL;
@@ -75,34 +94,51 @@ window.onload=updateURL;
     </head>
     <body>
     <h1>Storage Drive Layout Configurator</h1>
-    <div class='setting' id='setting'>
-
+    <div class="setting" id="setting">
         <div class="ServerModel">
             <p>Server Model Name:
-                <input width=100% type="text" value="<name>" class="ServerModelName" id="ServerModelName">
+                <input width=100% type="text" value="<name>" class="ServerModelName" id="ServerModelName"/>
             </p>
         </div>
 
-        <div class="BoxType">
+        <div class="BoxTypeDisplay" id="BoxTypeDisplay">
             <p>Server Chassis Type:
-            <select name='BoxType' id='BoxType'>
-                <option value='Rackmount'>Rackmount</option>
-                <option value='Tower'>Tower</option>
-                <option value='Others'>Others</option>
+            <select name="BoxType" id="BoxType">
+                <option value="Rackmount">Rackmount</option>
+                <option value="Tower">Tower</option>
+                <option value="Custom">Custom</option>
             </select>
             </p>
+            <div name="CustomXY" id="CustomXY" style="display:none">
+                <p>Custom Width: <input type="number" class="CustomX" id="CustomX" value=40>mm (millimeter)</p>
+                <p>Custom Height: <input type="number" class="CustomY" id="CustomY" value=40>mm (millimeter)</p>
+            <script>
+            var server_type = document.getElementById("BoxType");
+            server_type.oninput = function() {
+                let customxy = document.getElementById("CustomXY");
+                let shs = document.getElementById("ServerHeightDisplay");
+                if( server_type.value == "Custom" ){
+                    customxy.style.display = "initial";
+                    shs.style.display = "none";
+                } else {
+                    customxy.style.display="none";
+                    shs.style.display ="initial";
+                }
+            }
+            </script>
+            </div>
         </div>
-        <div class="ServerHeight">
+        <div class="ServerHeightDisplay" id="ServerHeightDisplay">
             <p>Server Height:
-            <select name='ServerHeightSelect' id='ServerHeightSelect'>
-                <option value='1'>1U</option>
-                <option value='2'>2U</option>
-                <option value='3'>3U</option>
-                <option value='4'>4U</option>
-                <option value='5'>5U</option>
-                <option value='6'>6U</option>
-                <option value='7'>7U</option>
-                <option value='8'>8U</option>
+            <select name="ServerHeightSelect" id="ServerHeightSelect">
+                <option value="1">1U</option>
+                <option value="2">2U</option>
+                <option value="3">3U</option>
+                <option value="4">4U</option>
+                <option value="5">5U</option>
+                <option value="6">6U</option>
+                <option value="7">7U</option>
+                <option value="8">8U</option>
             </select>
             <input width=100% type="range" min="1" max="8" value="1" class="slider" id="ServerHeight">
             <script>
@@ -118,17 +154,17 @@ window.onload=updateURL;
             </script>
             </p>
         </div>
-        <div class="DriveRow">
+        <div class="DriveRowDisplay">
             <p>Drive Row Number:
-            <select name='DriveRowSelect' id='DriveRowSelect'>
-                <option value='1'>1 Row</option>
-                <option value='2'>2 Row</option>
-                <option value='3'>3 Row</option>
-                <option value='4'>4 Row</option>
-                <option value='5'>5 Row</option>
-                <option value='6'>6 Row</option>
-                <option value='7'>7 Row</option>
-                <option value='8'>8 Row</option>
+            <select name="DriveRowSelect" id="DriveRowSelect">
+                <option value="1">1 Row</option>
+                <option value="2">2 Row</option>
+                <option value="3">3 Row</option>
+                <option value="4">4 Row</option>
+                <option value="5">5 Row</option>
+                <option value="6">6 Row</option>
+                <option value="7">7 Row</option>
+                <option value="8">8 Row</option>
             </select>
             <input width=100% type="range" min="1" max="8" value="1" class="slider" id="DriveRow">
             <script>
@@ -146,31 +182,31 @@ window.onload=updateURL;
         </div>
         <div class="DriveCol">
             <p>Drive Column Number:
-            <select name='DriveColSelect' id='DriveColSelect'>
-                <option value='1'>1 Column</option>
-                <option value='2'>2 Column</option>
-                <option value='3'>3 Column</option>
-                <option value='4'>4 Column</option>
-                <option value='5'>5 Column</option>
-                <option value='6'>6 Column</option>
-                <option value='7'>7 Column</option>
-                <option value='8'>8 Column</option>
-                <option value='9'>9 Column</option>
-                <option value='10'>10 Column</option>
-                <option value='11'>11 Column</option>
-                <option value='12'>12 Column</option>
-                <option value='13'>13 Column</option>
-                <option value='14'>14 Column</option>
-                <option value='15'>15 Column</option>
-                <option value='16'>16 Column</option>
-                <option value='17'>17 Column</option>
-                <option value='18'>18 Column</option>
-                <option value='19'>19 Column</option>
-                <option value='20'>20 Column</option>
-                <option value='21'>21 Column</option>
-                <option value='22'>22 Column</option>
-                <option value='23'>23 Column</option>
-                <option value='24'>24 Column</option>
+            <select name="DriveColSelect" id="DriveColSelect">
+                <option value="1">1 Column</option>
+                <option value="2">2 Column</option>
+                <option value="3">3 Column</option>
+                <option value="4">4 Column</option>
+                <option value="5">5 Column</option>
+                <option value="6">6 Column</option>
+                <option value="7">7 Column</option>
+                <option value="8">8 Column</option>
+                <option value="9">9 Column</option>
+                <option value="10">10 Column</option>
+                <option value="11">11 Column</option>
+                <option value="12">12 Column</option>
+                <option value="13">13 Column</option>
+                <option value="14">14 Column</option>
+                <option value="15">15 Column</option>
+                <option value="16">16 Column</option>
+                <option value="17">17 Column</option>
+                <option value="18">18 Column</option>
+                <option value="19">19 Column</option>
+                <option value="20">20 Column</option>
+                <option value="21">21 Column</option>
+                <option value="22">22 Column</option>
+                <option value="23">23 Column</option>
+                <option value="24">24 Column</option>
             </select>
             <input width=100% type="range" min="1" max="24" value="1" class="slider" id="DriveCol">
             <script>
@@ -189,7 +225,7 @@ window.onload=updateURL;
         <div class="TotalDrive">
             <p>Total Drive Number:
             <input type="text" class="TotalDriveText" id="TotalDriveText" value="1">
-            <input width=100% type="range" min="1" max="60" value="1" class="slider" id="TotalDrive">
+            <input width=100% type="range" min="1" max="120" value="1" class="slider" id="TotalDrive">
             <script>
             var total_driver_slider = document.getElementById("TotalDrive");
             var total_driver_text= document.getElementById("TotalDriveText");
@@ -205,20 +241,20 @@ window.onload=updateURL;
         </div>
         <div class="DriveType">
             <p>Hard Drive Type:
-            <select name='DriveType' id='DriveType'>
+            <select name="DriveType" id="DriveType">
                 <option value="3.5' HDD">3.5' HDD</option>
                 <option value="2.5' HDD">2.5' HDD</option>
                 <option value="2.5' HDD">2.5' SSD</option>
-                <option value='NVMe'>NVMe</option>
+                <option value="NVMe">NVMe</option>
             </select>
             </p>
         </div>
         <div class="DriveOrientation">
             <p>Hard Drive Orientation:
-            <select name='DriveOrientation' id='DriveOrientation'>
-                <option value='Vertical'>Vertical</option>
-                <option value='Horizontal'>Horizontal</option>
-                <option value='Others'>Others</option>
+            <select name="DriveOrientation" id="DriveOrientation">
+                <option value="Vertical">Vertical</option>
+                <option value="Horizontal">Horizontal</option>
+                <option value="Others">Others</option>
             </select>
             </p>
         </div>
@@ -226,37 +262,55 @@ window.onload=updateURL;
             <button onclick="window.call()">Draw</button>
             <script>
                 function call() {
-                    clear(draw);
+                    const url = new URL( window.location );
+
                     server_name = document.getElementById("ServerModelName").value;
+                    url.searchParams.set("ServerModelName", server_name);
+
                     boxtype = document.getElementById("BoxType").value;
-                    server_u = document.getElementById("ServerHeight").value;
+                    url.searchParams.set("BoxType", boxtype);
+
+                    if( boxtype == "Custom" ) {
+                        customx = document.getElementById("CustomX").value;
+                        url.searchParams.set("CustomX", customx);
+                        customy = document.getElementById("CustomY").value;
+                        url.searchParams.set("CustomY", customy);
+                        url.searchParams.delete("ServerHeight");
+                    } else if( boxtype == "Rackmount" || boxtype == "Tower" ) {
+                        server_u = document.getElementById("ServerHeight").value;
+                        url.searchParams.set("ServerHeight", server_u);
+                        url.searchParams.delete("CustomX");
+                        url.searchParams.delete("CustomY");
+                    }
                     drive_slot = document.getElementById("TotalDrive").value;
+                    url.searchParams.set("TotalDrive", drive_slot);
+
                     drive_row = document.getElementById("DriveRow").value;
+                    url.searchParams.set("DriveRow", drive_row);
+
                     drive_col = document.getElementById("DriveCol").value;
+                    url.searchParams.set("DriveCol", drive_col);
+
                     drive_type = document.getElementById("DriveType").value;
+                    url.searchParams.set("DriveType", drive_type);
+
                     drives_type = new Array(drive_slot);
                     for( i=0; i< drive_slot; i++ ){
                         // console.log( "TotalDrive " + drive_slot + "Drive Type =" + drive_type )
                         drives_type[i]= drive_type;
                     }
                     orientation = document.getElementById("DriveOrientation").value;
-                    drawDriveLayout(draw, server_name, boxtype, server_u, drive_slot, drive_row, drive_col, drives_type, orientation, 5, 5);
-//window.location.search = "?ServerModelName=" + server_name + "&BoxType=" + boxtype +
-//    "&ServerHeight=" + server_u + "&TotalDrive=" + drive_slot + "&DriveRow=" + drive_row +
-//    "&DriveCol=" + drive_col + "&DriveType=" + drive_type + "&Orientataion=" + orientataion;
-                    const url = new URL( window.location );
-                    url.searchParams.set('ServerModelName', server_name);
-                    url.searchParams.set('BoxType', boxtype);
-                    url.searchParams.set('ServerHeight', server_u);
-                    url.searchParams.set('TotalDrive', drive_slot);
-                    url.searchParams.set('DriveRow', drive_row);
-                    url.searchParams.set('ServerHeight', server_u);
-                    url.searchParams.set('TotalDrive', drive_slot);
-                    url.searchParams.set('DriveRow', drive_row);
-                    url.searchParams.set('DriveCol', drive_col);
-                    url.searchParams.set('DriveType', drive_type);
-                    url.searchParams.set('DriveOrientation', orientation);
-                    window.history.pushState({}, '', url);
+                    url.searchParams.set("DriveOrientation", orientation);
+
+                    clear(draw);
+                    if( boxtype == "Custom" ) {
+                        console.log( "Draw custom box on click" );
+                        drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
+                    } else {
+                        console.log( "Draw rack or towel box on click" );
+                        drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
+                    }
+                    window.history.pushState({}, "", url);
                 }
             </script>
             <div id="Download" class="Download">
@@ -282,7 +336,7 @@ window.onload=updateURL;
                 <pre><code id="jsonstring"></code></pre>
             </div>
         </div>
-    <div id='box' class='box'></div>
+    <div id="box" class="box"></div>
     </body>
 </html>
 

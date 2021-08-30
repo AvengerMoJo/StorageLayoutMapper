@@ -16,7 +16,7 @@ declare global {
     }
 }
 
-let draw = SVG().addTo('#box')
+let draw = SVG().addTo("#box")
 
 window.clear = clear;
 window.downloadString = downloadString;
@@ -30,10 +30,10 @@ function clear(thedraw:any){
 
 function downloadString(text:string, fileType:string, fileName:string) {
     var blob = new Blob([text], { type: fileType  });
-    var a = document.createElement('a');
+    var a = document.createElement("a");
     a.download = fileName;
     a.href = URL.createObjectURL(blob);
-    a.dataset.downloadurl = [fileType, a.download, a.href].join(':');
+    a.dataset.downloadurl = [fileType, a.download, a.href].join(":");
     a.style.display = "none";
     document.body.appendChild(a);
     a.click();
@@ -56,54 +56,48 @@ DriveType.HDD35, DriveType.HDD35, DriveType.HDD35, DriveType.HDD35, DriveType.HD
 ];
 */
 
-let server = new Server( 'Example', BoxType.Rackmount, 2, 24, 1, 24, ssd_type, SlotOrientation.Vertical);
-// let server = new Server( 'Node2', BoxType.Rackmount, 6, 24, 6, 4, hdd_type, SlotOrientation.Horizontal);
-// let server = new Server( 'Node3', BoxType.Rackmount, 7, 16, 16, 1, ssd_type, SlotOrientation.Horizontal);
-// let server = new Server( 'Node4', BoxType.Rackmount, 2, 24, 3, 4, hdd_type, SlotOrientation.Horizontal);
-// let server = new Server( 'Node5', BoxType.Rackmount, 1, 16, 1, 4, hdd_type, SlotOrientation.Horizontal);
-// let server = new Server( 'Node6', BoxType.Tower, 3, 16, 4, 4, hdd_type, SlotOrientation.Vertical);
+let server = new Server( "Example", BoxType.Rackmount, 24, 1, 24, ssd_type, SlotOrientation.Vertical, 2);
+// let server = new Server( "Node2", BoxType.Rackmount, 24, 6, 4, hdd_type, SlotOrientation.Horizontal, 6);
+// let server = new Server( "Node3", BoxType.Rackmount, 16, 16, 1, ssd_type, SlotOrientation.Horizontal, 7);
+// let server = new Server( "Node4", BoxType.Rackmount, 24, 3, 4, hdd_type, SlotOrientation.Horizontal, 2 );
+// let server = new Server( "Node5", BoxType.Rackmount, 16, 1, 4, hdd_type, SlotOrientation.Horizontal, 1);
+// let server = new Server( "Node6", BoxType.Tower, 16, 4, 4, hdd_type, SlotOrientation.Vertical, 3);
 draw.add( server.getSVG().move(5,5) );
 draw.size( server.width+((server.hd_z+1)*10)+10, (server.height*(1+server.hd_z))+10);
 //console.log( "Width = " + (server.width+(server.hd_z*6) +10) + " Height =" + ( server.height*(server.hd_z+2)+10));
 //console.log( "Z level = " +server.hd_z  );
 
 
-function drawDriveLayout( svg: any, server_name: string,
-        server_type: BoxType, server_unit: number, drive_slot: number,
-        drive_row: number, drive_col: number, drives_type: DriveType[],
-        slot_type: SlotOrientation, pic_move_x?: number, pic_move_y?: number) {
+function drawDriveLayout( svg: any, server_name: string, server_type: BoxType, 
+    drive_slot: number, drive_row: number, drive_col: number, drives_type: DriveType[],
+    slot_type: SlotOrientation, server_unit?: number, customx?: number, customy?: number,
+    pic_move_x?: number, pic_move_y?: number) {
+    var shift_x;
 
-    let server = new Server( server_name, server_type, server_unit, drive_slot,
-    drive_row, drive_col, drives_type, slot_type);
-    svg.add( server.getSVG().move(pic_move_x, pic_move_y) );
-    svg.size( server.width+((server.hd_z+1)*10)+10, (server.height*(1+server.hd_z))+10);
+    var newserver;
+    if( server_type == "Rackmount" || server_type == "Tower" ){
+        console.log("Rack and Tower draw!")
+        newserver = new Server( server_name, server_type, drive_slot,
+        drive_row, drive_col, drives_type, slot_type, server_unit);
+        svg.size(newserver.width+((server.hd_z+1)*6*server_unit)+10, (server.height*(1+server.hd_z))+10);
+    } else if( server_type == "Custom" ) {
+        newserver = new Server( server_name, server_type, drive_slot,
+        drive_row, drive_col, drives_type, slot_type, undefined, customx, customy);
+        console.log("Custom box x =" + customx + " box y = " + customy);
+        console.log("SVG size " + newserver.width + " x " + newserver.height );
+        svg.size(newserver.width+10, newserver.height+10);
+    }
+    svg.add( newserver.getSVG().move(pic_move_x, pic_move_y) );
+        console.log(pic_move_x + " x move," + pic_move_y + " y move !");
+
 }
 
 function showjson( svgstring: string ){
     let json = svgtojson( svgstring );
-    let jsonview = document.getElementById('jsonstring');
+    let jsonview = document.getElementById("jsonstring");
 
     if( json && jsonview )
         jsonview.innerHTML = json;
 }
-
-// sample server configuration
-
-//Rackmount 2U, 1 Row, 24 Columns, 24 slots 2.5", Drive Vertical, NON-Hot-Swap
-//drawDriveLayout(draw, BoxType.Rackmount, 2, 1, 24, 24, DriveType.HDD25, SlotOrientation.Vertical, 50, 50);
-
-//Rackmount 6U, 6 Rows, 4 Columns, 24 slots 3.5", Drive Horizontal, Hot-Swap
-//drawDriveLayout(draw, BoxType.Rackmount, 4, 6, 4, 24, DriveType.HDD35, SlotOrientation.Horizontal, 50, 150);
-
-//Rackmount 7U, 16 Rows, 1 Column 16 slots 2.5", Drive Horizontal, Hot-Swap
-//Rackmount 4U, 3 Row, 4 Columns, (front 12, back 12) 24 slots 3.5", Drive Horizontal, Hot-Swap
-//drawDriveLayout(draw, BoxType.Rackmount, 2, 3, 4, 24, DriveType.HDD35, SlotOrientation.Horizontal, 650, 400);
-
-//Rackmount 1U, 1 Row, 4 Columns, (z1 4, z2 4, z3 4, z4 4) 16 slots 3.5", Drive Horizontal, Hot-Swap
-//drawDriveLayout(draw, BoxType.Rackmount, 1, 1, 4, 12, DriveType.HDD35, SlotOrientation.Horizontal, 50, 400);
-
-//Rackmount 1U, 1 Row, 4 Columns, (z1 4, z2 4, z3 4, z4 4) 16 slots 3.5", Drive Horizontal, Hot-Swap
-//drawDriveLayout(draw, BoxType.Tower, 4, 1, 5, 5, DriveType.HDD35, SlotOrientation.Vertical, 50, 650);
-
 
 

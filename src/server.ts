@@ -44,40 +44,58 @@ export class Server implements ServerConfig {
     readonly decoration_y?: number;
     svg?: any;
 
-    constructor(name: string, size:BoxType, server_unit: number, hd_slot: number,
-    hd_row: number, hd_col: number, driveType: DriveType[], orientation?: SlotOrientation,
-    width?: number, height?: number, theclass?:string) {
+    constructor(name: string, size:BoxType, hd_slot: number, hd_row: number,
+        hd_col: number, driveType: DriveType[], orientation?: SlotOrientation,
+    server_unit?: number, width?: number, height?: number, theclass?:string) {
         this.name = name;
         this.size = size;
-        this.server_unit = server_unit;
         this.hd_slot = hd_slot;
         this.hd_row  = hd_row;
         this.hd_col  = hd_col;
         var z_hd_slot= hd_row * hd_col;
         this.hd_z    = Math.ceil(hd_slot / z_hd_slot)-1;
 
+        console.log( "Server Name:" + this.name)
+        console.log( "Server Size:" + this.size)
+        console.log( "Server slot:" + this.hd_slot)
+        console.log( "Server row:" + this.hd_row)
+        console.log( "Server col:" + this.hd_col)
+
         this.harddrive_list = new Array(this.hd_slot);
         for ( var i = 0; i < this.hd_slot; i++ ){
             this.harddrive_list[i] = new HardDrive( i, driveType[i], orientation );
         }
         if ( size == BoxType.Rackmount ) {
-            this.width = U_WIDTH;
-            this.height= U_HEIGHT * this.server_unit;
-            this.decoration_x = 100;
-            this.decoration_y = 5;
-        } else if ( size == BoxType.Tower) {
-            this.width = U_HEIGHT * this.server_unit;
-            this.height= U_WIDTH;
-            this.decoration_x = 5;
-            this.decoration_y = 50;
-        } else {
-            if ( width !== undefined && height !== undefined ) {
-                this.width = width;
-                this.height= height;
-                this.decoration_x = 5;
+            if ( server_unit !== undefined ) {
+                this.server_unit = server_unit;
+                this.width = U_WIDTH;
+                this.height= U_HEIGHT * this.server_unit;
+                this.decoration_x = 100;
                 this.decoration_y = 5;
             } else {
-                console.log( 'Error: Custom BoxType require width and height');
+                console.log( "Error: Rackmount BoxType require server_unit");
+            }
+
+        } else if ( size == BoxType.Tower) {
+            if ( server_unit !== undefined ) {
+                this.server_unit = server_unit;
+                this.width = U_HEIGHT * this.server_unit;
+                this.height= U_WIDTH;
+                this.decoration_x = 5;
+                this.decoration_y = 50;
+            } else {
+                console.log( "Error: Tower BoxType require server_unit");
+            }
+        } else {
+            console.log("Custom width x =" + width + " box height = " + height);
+            if ( width !== undefined && height !== undefined ) {
+                console.log( "Custom BoxType width " + width + " height " + height);
+                this.width = width;
+                this.height= height;
+                this.decoration_x = 100;
+                this.decoration_y = 100;
+            } else {
+                console.log( "Error: Custom BoxType require width and height");
                 return;
             }
         }
@@ -85,7 +103,7 @@ export class Server implements ServerConfig {
         if ( theclass !== undefined ) {
             this.class_tag = theclass;
         } else {
-            this.class_tag = 'Server';
+            this.class_tag = "Server";
         }
 
         this.svg = SVG().group();
@@ -94,37 +112,37 @@ export class Server implements ServerConfig {
             '" z_slot="' + this.hd_z + '"\>'));
 
         let decoration = SVG().group();
-        decoration.add( SVG().line(0, 0, 40, 0).stroke({width:3,color:'#000'}).move(5,0) );
-        decoration.add( SVG().circle().fill('none').stroke({width:3,color:'#000'}).radius(5).move(20,5) );
-        decoration.add( SVG().text( this.size ).font({ family: 'Helvetica', size: 12}).build(true).move(5,18));
-        decoration.add( SVG().text( this.name ).font({ family: 'Helvetica', size: 12}).build(true).move(5,30));
+        decoration.add( SVG().line(0, 0, 40, 0).stroke({width:3,color:"#000"}).move(5,0) );
+        decoration.add( SVG().circle().fill("none").stroke({width:3,color:"#000"}).radius(5).move(20,5) );
+        decoration.add( SVG().text( this.size ).font({ family: "Helvetica", size: 12}).build(true).move(5,18));
+        decoration.add( SVG().text( this.name ).font({ family: "Helvetica", size: 12}).build(true).move(5,30));
         if ( size == BoxType.Tower) {
-            decoration.add( SVG().text( '192.168.2.158' ).font({ family: 'Helvetica', size: 12}).build(true).move(45,18));
-            decoration.add( SVG().text( '192.168.128.158' ).font({ family: 'Helvetica', size: 12}).build(true).move(45,30));
+            decoration.add( SVG().text( "192.168.2.158" ).font({ family: "Helvetica", size: 12}).build(true).move(45,18));
+            decoration.add( SVG().text( "192.168.128.158" ).font({ family: "Helvetica", size: 12}).build(true).move(45,30));
         } else {
-            decoration.add( SVG().text( '192.168.2.158' ).font({ family: 'Helvetica', size: 12}).build(true).move(5,43));
-            decoration.add( SVG().text( '192.168.128.158' ).font({ family: 'Helvetica', size: 12}).build(true).move(5,55));
+            decoration.add( SVG().text( "192.168.2.158" ).font({ family: "Helvetica", size: 12}).build(true).move(5,43));
+            decoration.add( SVG().text( "192.168.128.158" ).font({ family: "Helvetica", size: 12}).build(true).move(5,55));
         }
 
-        //console.log( 'Server Height = ' + this.height + ' Width =' + this.width);
+        //console.log( "Server Height = " + this.height + " Width =" + this.width);
         var row_gap = Math.floor( (this.height -this.decoration_y) / this.hd_row)-2;
         var col_gap = Math.floor( (this.width-this.decoration_x) / this.hd_col);
 
         for (var z = 0; z < this.hd_z+1; z++) {
-            // console.log( 'Hard-Drive Z = ' + z + ' z_hd_slot=' + z_hd_slot );
+            // console.log( "Hard-Drive Z = " + z + " z_hd_slot=" + z_hd_slot );
             let z_group = SVG().group();
 
-            let box = SVG().rect(this.width, this.height).fill('none').stroke({color:'#000', width:5}).radius(5);
+            let box = SVG().rect(this.width, this.height).fill("none").stroke({color:"#000", width:5}).radius(5);
             let harddrive_group = SVG().group();
 
             for (var r = 0; r < this.hd_row; r++) {
-            // console.log( 'Hard-Drive Row = ' + r );
+            // console.log( "Hard-Drive Row = " + r );
                 let new_row_group = SVG().group();
                 for (var c = 0; c < this.hd_col && (z_hd_slot*z)+(this.hd_col*r+c) < this.hd_slot; c++) {
                     var pos = r * this.hd_col + z * z_hd_slot;
                     // var shift_y = this.harddrive_list[pos+c].height + 3;
                     // var shift_x = this.harddrive_list[pos+c].width + 3;
-                    // console.log( 'Hard-Drive Col = ' + c + ' width=' + shift_x + ' height=' + shift_y );
+                    // console.log( "Hard-Drive Col = " + c + " width=" + shift_x + " height=" + shift_y );
                     // new_row_group.add( this.harddrive_list[pos+c].getSVG().move(0,-18*c) );
                     if ( orientation === SlotOrientation.Vertical ) {
                         new_row_group.add( this.harddrive_list[pos+c].getSVG().move(0, -col_gap*c) );
@@ -134,11 +152,11 @@ export class Server implements ServerConfig {
                     }
                 }
                 new_row_group.move(this.decoration_x, this.decoration_y + row_gap*r+2);
-                //console.log( 'Hard-Drive Row gap = ' + row_gap + ' Col gap = ' + col_gap + ' shift_x=' + shift_x + ' shift_y='+shift_y );
+                //console.log( "Hard-Drive Row gap = " + row_gap + " Col gap = " + col_gap + " shift_x=" + shift_x + " shift_y="+shift_y );
                 harddrive_group.add( new_row_group );
             }
             if( z > 0 ) {
-                box.attr({stroke: '#555',"stroke-dasharray":[5,5] })
+                box.attr({stroke: "#555","stroke-dasharray":[5,5] })
             } else {
                 z_group.add(decoration.move(10,10));
             }
