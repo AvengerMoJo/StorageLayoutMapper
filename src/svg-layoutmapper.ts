@@ -75,20 +75,15 @@ function drawDriveLayout( svg: any, server_name: string, server_type: BoxType,
 
     var newserver;
     if( server_type == "Rackmount" || server_type == "Tower" ){
-        console.log("Rack and Tower draw!")
         newserver = new Server( server_name, server_type, drive_slot,
         drive_row, drive_col, drives_type, slot_type, server_unit);
-        svg.size(newserver.width+((server.hd_z+1)*6*newserver.server_unit)+10, (newserver.height*(1+newserver.hd_z))+10);
+        svg.size(newserver.width+((newserver.hd_z+1)*6*newserver.server_unit)+10, (newserver.height*(1+newserver.hd_z))+10);
     } else if( server_type == "Custom" ) {
         newserver = new Server( server_name, server_type, drive_slot,
         drive_row, drive_col, drives_type, slot_type, undefined, customx, customy);
-        console.log("Custom box x =" + customx + " box y = " + customy);
-        console.log("SVG size " + newserver.width + " x " + newserver.height );
-        svg.size(newserver.width+10, newserver.height+10);
+        svg.size( newserver.width+10, newserver.height+10);
     }
     svg.add( newserver.getSVG().move(pic_move_x, pic_move_y) );
-        console.log(pic_move_x + " x move," + pic_move_y + " y move !");
-
 }
 
 function showjson( svgstring: string ){

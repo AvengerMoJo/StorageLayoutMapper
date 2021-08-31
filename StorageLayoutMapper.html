@@ -32,8 +32,8 @@ function updateURL() {
         let customxy = document.getElementById("CustomXY");
         document.getElementById("BoxType").value = boxtype = params.get("BoxType");
         if( boxtype == "Custom" ) {
-            document.getElementById("CustomX").value = customx = params.get("CustomX");
-            document.getElementById("CustomY").value = customy = params.get("CustomY");
+            document.getElementById("CustomX").value = customx = +params.get("CustomX");
+            document.getElementById("CustomY").value = customy = +params.get("CustomY");
             customxy.style.display="initial";
             shs.style.display = "none";
         } else if( boxtype == "Rackmount" || boxtype == "Tower" ) {
@@ -80,11 +80,9 @@ function updateURL() {
     if( server_info_completed ) {
         clear(draw);
         if( boxtype == "Custom" ) {
-            console.log( "Draw custom box!" );
             drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
         }
         else if ( boxtype == "Rackmount" || boxtype == "Tower" ) {
-            console.log( "Draw rack, tower box!" );
             drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
         }
     }
@@ -271,13 +269,13 @@ window.onload=updateURL;
                     url.searchParams.set("BoxType", boxtype);
 
                     if( boxtype == "Custom" ) {
-                        customx = document.getElementById("CustomX").value;
+                        customx = +document.getElementById("CustomX").value;
                         url.searchParams.set("CustomX", customx);
-                        customy = document.getElementById("CustomY").value;
+                        customy = +document.getElementById("CustomY").value;
                         url.searchParams.set("CustomY", customy);
                         url.searchParams.delete("ServerHeight");
                     } else if( boxtype == "Rackmount" || boxtype == "Tower" ) {
-                        server_u = document.getElementById("ServerHeight").value;
+                        server_u = +document.getElementById("ServerHeight").value;
                         url.searchParams.set("ServerHeight", server_u);
                         url.searchParams.delete("CustomX");
                         url.searchParams.delete("CustomY");
@@ -304,10 +302,8 @@ window.onload=updateURL;
 
                     clear(draw);
                     if( boxtype == "Custom" ) {
-                        console.log( "Draw custom box on click" );
                         drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
                     } else {
-                        console.log( "Draw rack or towel box on click" );
                         drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
                     }
                     window.history.pushState({}, "", url);

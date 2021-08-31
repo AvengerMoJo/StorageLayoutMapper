@@ -55,12 +55,6 @@ export class Server implements ServerConfig {
         var z_hd_slot= hd_row * hd_col;
         this.hd_z    = Math.ceil(hd_slot / z_hd_slot)-1;
 
-        console.log( "Server Name:" + this.name)
-        console.log( "Server Size:" + this.size)
-        console.log( "Server slot:" + this.hd_slot)
-        console.log( "Server row:" + this.hd_row)
-        console.log( "Server col:" + this.hd_col)
-
         this.harddrive_list = new Array(this.hd_slot);
         for ( var i = 0; i < this.hd_slot; i++ ){
             this.harddrive_list[i] = new HardDrive( i, driveType[i], orientation );
@@ -88,9 +82,7 @@ export class Server implements ServerConfig {
                 console.log( "Error: Tower BoxType require server_unit");
             }
         } else {
-            console.log("Custom width x =" + width + " box height = " + height);
             if ( width !== undefined && height !== undefined ) {
-                console.log( "Custom BoxType width " + width + " height " + height);
                 this.width = width;
                 this.height= height;
                 this.decoration_x = 100;
