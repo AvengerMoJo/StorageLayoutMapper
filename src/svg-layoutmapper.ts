@@ -20,9 +20,17 @@ declare global {
     }
 }
 
+let ssd_type = [
+DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25,
+DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25,
+DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25,
+DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25
+];
+
 let draw = SVG().addTo("#box");
 let diaShapeHeader = "";
-var server_obj = Server();
+var server_obj = new Server( "Example", BoxType.Rackmount, 24, 1, 24, ssd_type, SlotOrientation.Vertical, 2);
+
 
 window.clear = clear;
 window.downloadString = downloadString;
@@ -51,12 +59,6 @@ function downloadString(text:string, fileType:string, fileName:string) {
     setTimeout(function() { URL.revokeObjectURL(a.href);  }, 1500);
 }
 
-let ssd_type = [
-DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25,
-DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25,
-DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25,
-DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25, DriveType.SSD25
-];
 /*
 let hdd_type = [
 DriveType.HDD35, DriveType.HDD35, DriveType.HDD35, DriveType.HDD35, DriveType.HDD35, DriveType.HDD35,
@@ -66,14 +68,14 @@ DriveType.HDD35, DriveType.HDD35, DriveType.HDD35, DriveType.HDD35, DriveType.HD
 ];
 */
 
-let server = new Server( "Example", BoxType.Rackmount, 24, 1, 24, ssd_type, SlotOrientation.Vertical, 2);
+//let server = new Server( "Example", BoxType.Rackmount, 24, 1, 24, ssd_type, SlotOrientation.Vertical, 2);
 // let server = new Server( "Node2", BoxType.Rackmount, 24, 6, 4, hdd_type, SlotOrientation.Horizontal, 6);
 // let server = new Server( "Node3", BoxType.Rackmount, 16, 16, 1, ssd_type, SlotOrientation.Horizontal, 7);
 // let server = new Server( "Node4", BoxType.Rackmount, 24, 3, 4, hdd_type, SlotOrientation.Horizontal, 2 );
 // let server = new Server( "Node5", BoxType.Rackmount, 16, 1, 4, hdd_type, SlotOrientation.Horizontal, 1);
 // let server = new Server( "Node6", BoxType.Tower, 16, 4, 4, hdd_type, SlotOrientation.Vertical, 3);
-draw.add( server.getSVG().move(5,5) );
-draw.size( server.width+((server.hd_z+1)*10)+10, (server.height*(1+server.hd_z))+10);
+draw.add( server_obj.getSVG().move(5,5) );
+draw.size( server_obj.width+((server_obj.hd_z+1)*10)+10, (server_obj.height*(1+server_obj.hd_z))+10);
 //console.log( "Width = " + (server.width+(server.hd_z*6) +10) + " Height =" + ( server.height*(server.hd_z+2)+10));
 //console.log( "Z level = " +server.hd_z  );
 
