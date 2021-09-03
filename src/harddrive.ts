@@ -29,6 +29,7 @@ export interface HardDriveConfig {
     width?: number;
     height?: number;
     svg?: any;
+    shape?: string;
 }
 
 export class HardDrive implements HardDriveConfig {
@@ -39,8 +40,10 @@ export class HardDrive implements HardDriveConfig {
     readonly width?: number;
     readonly height?: number;
     svg?: any;
+    shape?: any;
 
     constructor(name: string, size:DriveType, orientation?:SlotOrientation, theclass?:string ) {
+        var rotation, shapex, shapey;
         this.name = name;
         this.size = size;
         this.width = NVMEX;
@@ -68,21 +71,40 @@ export class HardDrive implements HardDriveConfig {
             this.orientation = orientation;
         } else {
             this.orientation = SlotOrientation.Horizontal;
+            rotation = 0;
         }
         this.svg = SVG().group();
-        this.svg.add( SVG('<harddrive name="' + this.name + '" class="' + this.class_tag + '" type="' + this.size + '" orientation="' + this.orientation + '"\>'));
+        // this.svg.add( SVG('<harddrive name="' + this.name + '" class="' + this.class_tag + '" type="' + this.size + '" orientation="' + this.orientation + '"\>'));
         this.svg.add( SVG().rect( this.width, this.height ).attr({ fill: 'none', stroke: '#000', 'stroke-width': 2}).radius(this.height/5) );
         this.svg.add( SVG().text( this.size + ' ' + this.name ).font({ family: 'Helvetica', size: 12}).build(true).move(2,0));
+        shapex = this.width;
+        shapey = this.height;
         if ( this.orientation == SlotOrientation.Vertical ) {
             this.svg.rotate(90);
+            rotation = 270;
+            shapex = this.height;
+            shapey = this.width;
         }
+        this.shape = `
+<fillstroke />
+    <fontsize size="12"/>
+    <roundrect x="%s" y="%s" w="${shapex}" h="${shapey}" arcsize="${this.width/5}"/>
+    <text str="${this.size}-${this.name}" x="%s" y="%s" align="left" valign="middle" vertical="0" rotation="${rotation}" align-shape="1"/>
+<stroke />
+        `
     }
 
     getSVG(): typeof SVG {
         return this.svg;
     }
 
-};
+    getShape( x: number, y: number, textx: number, texty: number ): string {
+        var match = [ x, y, textx, texty]
+        var i = 0;
+        return this.shape.replace(/%s/g, ()=>match[i++]);
+    }
+}
+;
 
 
 export { HardDrive as default }

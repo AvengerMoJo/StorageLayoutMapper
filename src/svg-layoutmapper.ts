@@ -13,19 +13,29 @@ declare global {
         drawDriveLayout:any;
         downloadString:any;
         showjson:any;
+        showShape:any;
+        diaShapeDraw:any;
+        diaShapeHeader:any;
+        server_obj:any;
     }
 }
 
-let draw = SVG().addTo("#box")
+let draw = SVG().addTo("#box");
+let diaShapeHeader = "";
+var server_obj = Server();
 
 window.clear = clear;
 window.downloadString = downloadString;
 window.drawDriveLayout = drawDriveLayout;
 window.draw = draw;
 window.showjson = showjson;
+window.showShape= showShape;
+window.diaShapeDraw= diaShapeDraw;
+window.diaShapeHeader = diaShapeHeader;
+window.server_obj = server_obj;
 
 function clear(thedraw:any){
-    thedraw.clear()
+    thedraw.clear();
 }
 
 function downloadString(text:string, fileType:string, fileName:string) {
@@ -71,19 +81,35 @@ draw.size( server.width+((server.hd_z+1)*10)+10, (server.height*(1+server.hd_z))
 function drawDriveLayout( svg: any, server_name: string, server_type: BoxType, 
     drive_slot: number, drive_row: number, drive_col: number, drives_type: DriveType[],
     slot_type: SlotOrientation, server_unit?: number, customx?: number, customy?: number,
-    pic_move_x?: number, pic_move_y?: number) {
-
-    var newserver;
+    pic_move_x?: number, pic_move_y?: number): Server{
+    var canvas_height, canvas_width;
     if( server_type == "Rackmount" || server_type == "Tower" ){
-        newserver = new Server( server_name, server_type, drive_slot,
+        server_obj = new Server( server_name, server_type, drive_slot,
         drive_row, drive_col, drives_type, slot_type, server_unit);
-        svg.size(newserver.width+((newserver.hd_z+1)*6*newserver.server_unit)+10, (newserver.height*(1+newserver.hd_z))+10);
+        canvas_width = server_obj.width+((server_obj.hd_z+1)*6*server_obj.server_unit)+10;
+        canvas_height =server_obj.height*(1+server_obj.hd_z)+10;
+        svg.size( canvas_width, canvas_height);
     } else if( server_type == "Custom" ) {
-        newserver = new Server( server_name, server_type, drive_slot,
+        server_obj = new Server( server_name, server_type, drive_slot,
         drive_row, drive_col, drives_type, slot_type, undefined, customx, customy);
-        svg.size( newserver.width+10, newserver.height+10);
+        canvas_width = server_obj.width+10;
+        canvas_height =server_obj.height+10;
+        svg.size( canvas_width, canvas_height );
     }
-    svg.add( newserver.getSVG().move(pic_move_x, pic_move_y) );
+    svg.add( server_obj.getSVG().move(pic_move_x, pic_move_y) );
+    diaShapeHeader =`
+<shape h="${canvas_height}" w="${canvas_width}" aspect="fixed" strokewidth="inherit">
+    <connections>
+        <constraint x="0" y="0" perimeter="1" />
+        <constraint x="0.5" y="0" perimeter="1" />
+        <constraint x="1" y="0" perimeter="1" />
+        <constraint x="0" y="0.5" perimeter="1" />
+        <constraint x="1" y="0.5" perimeter="1" />
+        <constraint x="0" y="1" perimeter="1" />
+        <constraint x="0.5" y="1" perimeter="1" />
+        <constraint x="1" y="1" perimeter="1" />
+    </connections>`
+    return server_obj;
 }
 
 function showjson( svgstring: string ){
@@ -94,4 +120,13 @@ function showjson( svgstring: string ){
         jsonview.innerHTML = json;
 }
 
+function showShape( shapestring: string ){
+    console.log("shape="+shapestring)
+    let shapeview = document.getElementById("diastring");
+    shapeview!.innerHTML = diaShapeHeader + shapestring + "</shape>";
+}
+
+function diaShapeDraw( theserver: Server){
+    showShape(theserver.getShape());
+}
 

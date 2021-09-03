@@ -80,10 +80,10 @@ function updateURL() {
     if( server_info_completed ) {
         clear(draw);
         if( boxtype == "Custom" ) {
-            drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
+            server_obj = drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
         }
         else if ( boxtype == "Rackmount" || boxtype == "Tower" ) {
-            drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
+            server_obj = drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
         }
     }
 }
@@ -257,9 +257,9 @@ window.onload=updateURL;
             </p>
         </div>
         <div id="Draw" class="Draw">
-            <button onclick="window.call()">Draw</button>
+            <button onclick="window.call('SVG')">Draw</button>
             <script>
-                function call() {
+                function call(graphtype) {
                     const url = new URL( window.location );
 
                     server_name = document.getElementById("ServerModelName").value;
@@ -300,11 +300,22 @@ window.onload=updateURL;
                     orientation = document.getElementById("DriveOrientation").value;
                     url.searchParams.set("DriveOrientation", orientation);
 
-                    clear(draw);
-                    if( boxtype == "Custom" ) {
-                        drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
-                    } else {
-                        drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
+                    if( graphtype == "SVG" ) {
+                        clear(draw);
+                        if( boxtype == "Custom" ) {
+                            server_obj = drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
+                        } else {
+                            server_obj = drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
+                        }
+                    } else if( graphtype == "Diagrams-Shape" ) {
+                        if( boxtype == "Custom" ) {
+                            server_obj = drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, undefined, customx, customy, 5, 5);
+                            diaShapeDraw(server_obj);
+                        } else {
+                            server_obj = drawDriveLayout(draw, server_name, boxtype, drive_slot, drive_row, drive_col, drives_type, orientation, server_u, undefined, undefined, 5, 5);
+                            diaShapeDraw(server_obj);
+                        }
+
                     }
                     window.history.pushState({}, "", url);
                 }
@@ -321,17 +332,48 @@ window.onload=updateURL;
             </div>
         </div>
     </div>
-        <div id="Json" class="Json">
+    <div id="tab" class="tab">
+        <script>
+            function switchTab(theEvent, tabName) {
+                var i, tabview, tablinks;
+                tabview = document.getElementsByClassName("tabview");
+                for (i = 0; i < tabview.length; i++) {
+                    tabview[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(tabName).style.display = "block";
+                theEvent.currentTarget.className += " active";
+            }
+        </script>
+        <button class="tablinks" onclick="switchTab(event, 'Json')">JSON</button>
+        <button class="tablinks" onclick="switchTab(event, 'diagrams.net')">diagrams.net</button>
+        <div id="Json" class="tabview">
             <button onclick="window.jsonview()">JSON-View</button>
             <script>
                 function jsonview() {
                     showjson( draw.svg() );
                 }
             </script>
-            <div id="JsonView" class="JsonView">
+            <div id="JsonView" class="code">
                 <pre><code id="jsonstring"></code></pre>
             </div>
         </div>
+        <div id="diagrams.net" class="tabview">
+            <button onclick="window.shapeview()">Diagrams-Shape</button>
+            <script>
+                function shapeview() {
+                    console.log(" Object server = " +server_obj);
+                    diaShapeDraw(server_obj);
+                }
+            </script>
+            <div id="DiagramsShapeView" class="code">
+                <pre><textarea id="diastring" rows="25" cols="80"></textarea></pre>
+            </div>
+        </div>
+    </div>
     <div id="box" class="box"></div>
     </body>
 </html>

@@ -26,6 +26,7 @@ export interface ServerConfig {
     readonly decoration_x?: number;
     readonly decoration_y?: number;
     svg?: any;
+    shape?: string;
 }
 
 export class Server implements ServerConfig {
@@ -43,6 +44,7 @@ export class Server implements ServerConfig {
     readonly decoration_x?: number;
     readonly decoration_y?: number;
     svg?: any;
+    shape?: string;
 
     constructor(name: string, size:BoxType, hd_slot: number, hd_row: number,
         hd_col: number, driveType: DriveType[], orientation?: SlotOrientation,
@@ -108,6 +110,23 @@ export class Server implements ServerConfig {
         decoration.add( SVG().circle().fill("none").stroke({width:3,color:"#000"}).radius(5).move(20,5) );
         decoration.add( SVG().text( this.size ).font({ family: "Helvetica", size: 12}).build(true).move(5,18));
         decoration.add( SVG().text( this.name ).font({ family: "Helvetica", size: 12}).build(true).move(5,30));
+
+        let decoration_shape = `
+    <fillstroke />
+    <path>
+        <move x="10" y="10"/>
+        <line x="50" y="10"/>
+    </path>
+    <fillstroke />
+    <ellipse x="25" y="15" w="10" h="10" />
+    <stroke />
+    <fillstroke />
+    <text str="${this.size}" x="10" y="30" align="left" valign="middle" vertical="0" align-shape="1" />
+    <text str="${this.name}" x="10" y="40" align="left" valign="middle" vertical="0" align-shape="1" />
+    <stroke />
+        `
+
+        /*
         if ( size == BoxType.Tower) {
             decoration.add( SVG().text( "192.168.2.158" ).font({ family: "Helvetica", size: 12}).build(true).move(45,18));
             decoration.add( SVG().text( "192.168.128.158" ).font({ family: "Helvetica", size: 12}).build(true).move(45,30));
@@ -115,11 +134,14 @@ export class Server implements ServerConfig {
             decoration.add( SVG().text( "192.168.2.158" ).font({ family: "Helvetica", size: 12}).build(true).move(5,43));
             decoration.add( SVG().text( "192.168.128.158" ).font({ family: "Helvetica", size: 12}).build(true).move(5,55));
         }
+        */
 
         //console.log( "Server Height = " + this.height + " Width =" + this.width);
         var row_gap = Math.floor( (this.height -this.decoration_y) / this.hd_row)-2;
         var col_gap = Math.floor( (this.width-this.decoration_x) / this.hd_col);
 
+        var z_shape = '';
+        var hd_shape = ''; 
         for (var z = 0; z < this.hd_z+1; z++) {
             // console.log( "Hard-Drive Z = " + z + " z_hd_slot=" + z_hd_slot );
             let z_group = SVG().group();
@@ -132,8 +154,10 @@ export class Server implements ServerConfig {
                 let new_row_group = SVG().group();
                 for (var c = 0; c < this.hd_col && (z_hd_slot*z)+(this.hd_col*r+c) < this.hd_slot; c++) {
                     var pos = r * this.hd_col + z * z_hd_slot;
-                    // var shift_y = this.harddrive_list[pos+c].height + 3;
-                    // var shift_x = this.harddrive_list[pos+c].width + 3;
+                    var text_y = this.harddrive_list[pos+c].height/10;
+                    var text_x = this.harddrive_list[pos+c].width /10;
+                    var z_x = z *(this.height/8);
+                    var z_y = z*this.height;
                     // console.log( "Hard-Drive Col = " + c + " width=" + shift_x + " height=" + shift_y );
                     // new_row_group.add( this.harddrive_list[pos+c].getSVG().move(0,-18*c) );
                     if ( orientation === SlotOrientation.Vertical ) {
@@ -142,6 +166,11 @@ export class Server implements ServerConfig {
                     else {
                         new_row_group.add( this.harddrive_list[pos+c].getSVG().move(col_gap*c,0) );
                     }
+                    hd_shape+=`
+    <fillstroke />
+        ${this.harddrive_list[pos+c].getShape(this.decoration_x + c*col_gap + z_x, this.decoration_y+r*row_gap + z_y,
+        this.decoration_x + c*col_gap + text_x + z_x, this.decoration_y+r*row_gap + text_y + z_y)}
+    <stroke />`
                 }
                 new_row_group.move(this.decoration_x, this.decoration_y + row_gap*r+2);
                 //console.log( "Hard-Drive Row gap = " + row_gap + " Col gap = " + col_gap + " shift_x=" + shift_x + " shift_y="+shift_y );
@@ -149,18 +178,45 @@ export class Server implements ServerConfig {
             }
             if( z > 0 ) {
                 box.attr({stroke: "#555","stroke-dasharray":[5,5] })
+                z_shape +=`
+<save/>
+<dashed dashed="1"/>
+                `
             } else {
                 z_group.add(decoration.move(10,10));
             }
             z_group.add( box );
             z_group.add( harddrive_group.dmove(5,5) );
             z_group.move( z * (this.height / 8), (this.hd_z - z) * this.height);
+            z_shape +=`
+    <fillstroke />
+    <rect x="${z*(this.height/8)}" y="${z*this.height}" w="${this.width}" h="${this.height}" />
+    <stroke />`
+            if( z > 0 ) {
+                z_shape +="<restore/>"
+            }
             this.svg.add(z_group);
         }
+        this.shape = `
+<background>
+    <save/>
+    <strokewidth width="3"/>
+    ${decoration_shape}
+    ${z_shape}
+    <restore/>
+</background>
+<foreground>
+    ${hd_shape}
+</foreground>`
+        console.log( "finally shape ==" + this.shape )
     }
 
     getSVG(): typeof SVG {
         return this.svg;
+    }
+
+    getShape(): string {
+        return this.shape!;
     }
 
 };
