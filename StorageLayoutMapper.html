@@ -347,9 +347,19 @@ window.onload=updateURL;
                 document.getElementById(tabName).style.display = "block";
                 theEvent.currentTarget.className += " active";
             }
+
+            function updateColorTab(){
+                var elements = document.getElementsByClassName('HardDrive');
+                for (var i = 0; i < elements.length; i++) {
+                    var element = elements[i];
+                    var select_hd_id = document.getElementById("HardDriveID");
+                    select_hd_id.options[ select_hd_id.options.length ] = new Option(element.id, element.id);
+                }
+            }
         </script>
         <button class="tablinks" onclick="switchTab(event, 'Json')">JSON</button>
         <button class="tablinks" onclick="switchTab(event, 'diagrams.net')">diagrams.net</button>
+        <button class="tablinks" onclick="switchTab(event, 'ColorTab');updateColorTab();">Color Change</button>
         <div id="Json" class="tabview">
             <button onclick="window.jsonview()">JSON-View</button>
             <script>
@@ -371,6 +381,39 @@ window.onload=updateURL;
             </script>
             <div id="DiagramsShapeView" class="code">
                 <pre><textarea id="diastring" rows="25" cols="80"></textarea></pre>
+            </div>
+        </div>
+        <div id="ColorTab" class="tabview">
+            <button onclick="window.colorchangeview()">ColorChange</button>
+            <script>
+                function colorchangeview() {
+                    color = document.getElementById("HardDriveColor").value;
+                    drive = document.getElementById("HardDriveID").value;
+                    if( drive == "All" ) {
+                        var elements = document.getElementsByClassName('HardDrive');
+                        for (var i = 0; i < elements.length; i++) {
+                            var element = elements[i];
+                            element.style.fill = color;
+                        }
+                    } else {
+                      document.getElementById(drive).style.fill = color;
+                    }
+                    //document.getElementById( document.getElementById("HardDriveID").value).style.fill = document.getElementById("DriveColor").value;
+                }
+            </script>
+            <div id="ColorChangeView" class="menu">
+                <p>Color HD change into:
+                    <select name="HardDriveColor" id="HardDriveColor">
+                        <option value="white">White</option>
+                        <option value="green">Green</option>
+                        <option value="orange">Orange</option>
+                        <option value="red">Red</option>
+                    </select>
+                </p>
+                <p>Change Color for HardDrive ID :</p>
+                <select name="HardDriveID" id="HardDriveID">
+                    <option value="All">All</option>
+                </select>
             </div>
         </div>
     </div>
