@@ -18,6 +18,7 @@ declare global {
         diaShapeHeader:any;
         server_obj:any;
         updateSerialNumber:any;
+        onDriveSelectionChange:any;
     }
 }
 
@@ -43,6 +44,7 @@ window.diaShapeDraw= diaShapeDraw;
 window.diaShapeHeader = diaShapeHeader;
 window.server_obj = server_obj;
 window.updateSerialNumber = updateSerialNumber;
+window.onDriveSelectionChange = onDriveSelectionChange;
 
 function clear(thedraw:any){
     thedraw.clear();
@@ -139,9 +141,10 @@ function updateSingleSerial(driveId: string, serialNumber: string){
     if (element) {
         let title: any = element.querySelector('title');
         if (!title) {
+            const svgGroup = SVG(element);
             title = document.createElementNS("http://www.w3.org/2000/svg", "title");
             title.textContent = serialNumber;
-            element.appendChild(title);
+            svgGroup.node.insertBefore(title, svgGroup.node.firstChild);
         } else {
             title.textContent = serialNumber;
         }
@@ -154,9 +157,10 @@ function updateAllSerials(serialNumber: string){
         const element = elements[i];
         let title: any = element.querySelector('title');
         if (!title) {
+            const svgGroup = SVG(element);
             title = document.createElementNS("http://www.w3.org/2000/svg", "title");
             title.textContent = serialNumber;
-            element.appendChild(title);
+            svgGroup.node.insertBefore(title, svgGroup.node.firstChild);
         } else {
             title.textContent = serialNumber;
         }
@@ -174,6 +178,30 @@ function updateSerialNumber(){
         updateAllSerials(serialNumber);
     } else {
         updateSingleSerial(driveId, serialNumber);
+    }
+}
+
+function onDriveSelectionChange(){
+    const driveIdInput = document.getElementById("HardDriveID") as HTMLSelectElement;
+    const serialInput = document.getElementById("SerialNumber") as HTMLInputElement;
+    
+    const driveId = driveIdInput.value;
+    
+    if (driveId === "All") {
+        serialInput.value = "";
+        serialInput.placeholder = "Enter serial for ALL drives...";
+    } else {
+        const element = document.getElementById(driveId);
+        if (element) {
+            const title = element.querySelector('title');
+            if (title && title.textContent) {
+                serialInput.value = title.textContent;
+                serialInput.placeholder = "e.g., SN12345";
+            } else {
+                serialInput.value = "";
+                serialInput.placeholder = "No serial set for " + driveId;
+            }
+        }
     }
 }
 

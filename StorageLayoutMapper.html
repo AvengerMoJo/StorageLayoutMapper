@@ -433,6 +433,28 @@ window.onload=updateURL;
                     }
                 }
 
+                function onDriveSelectionChange() {
+                    var driveId = document.getElementById("HardDriveID").value;
+                    var serialInput = document.getElementById("SerialNumber");
+                    
+                    if (driveId === "All") {
+                        serialInput.value = "";
+                        serialInput.placeholder = "Enter serial for ALL drives...";
+                    } else {
+                        var element = document.getElementById(driveId);
+                        if (element) {
+                            var title = element.querySelector('title');
+                            if (title && title.textContent) {
+                                serialInput.value = title.textContent;
+                                serialInput.placeholder = "e.g., SN12345";
+                            } else {
+                                serialInput.value = "";
+                                serialInput.placeholder = "No serial set for " + driveId;
+                            }
+                        }
+                    }
+                }
+
                 function updateSingleSerial(driveId, serialNumber) {
                     var element = document.getElementById(driveId);
                     if (element) {
@@ -489,7 +511,7 @@ window.onload=updateURL;
                     </select>
                 </p>
                 <p>Change Color for HardDrive ID :</p>
-                <select name="HardDriveID" id="HardDriveID">
+                <select name="HardDriveID" id="HardDriveID" onchange="window.onDriveSelectionChange()">
                     <option value="All">All</option>
                 </select>
                 <hr style="border-color: #555; margin: 20px 0;">
@@ -497,10 +519,45 @@ window.onload=updateURL;
                     <input type="text" id="SerialNumber" placeholder="e.g., SN12345" style="margin-left: 10px; padding: 5px; width: 200px;">
                 </p>
                 <button onclick="window.updateSerialNumber()">Update Serial</button>
+                <p style="margin-top: 20px; font-size: 12px; color: #888;">
+                    <strong>Tip:</strong> Select a drive ID above to see its current serial number. Each drive can have its own serial number like colors.
+                </p>
             </div>
         </div>
     </div>
     <div id="box" class="box"></div>
+    <div id="serialTooltip"></div>
+    <script>
+        // Custom tooltip for serial numbers
+        const tooltip = document.getElementById('serialTooltip');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('mouseover', function(e) {
+                const target = e.target.closest('.HardDrive');
+                if (target) {
+                    const title = target.querySelector('title');
+                    if (title && title.textContent) {
+                        tooltip.textContent = title.textContent;
+                        tooltip.style.display = 'block';
+                    }
+                }
+            }, true);
+            
+            document.addEventListener('mouseout', function(e) {
+                const target = e.target.closest('.HardDrive');
+                if (target) {
+                    tooltip.style.display = 'none';
+                }
+            }, true);
+            
+            document.addEventListener('mousemove', function(e) {
+                if (tooltip.style.display === 'block') {
+                    tooltip.style.left = (e.pageX + 15) + 'px';
+                    tooltip.style.top = (e.pageY + 15) + 'px';
+                }
+            }, true);
+        });
+    </script>
     </body>
 </html>
 
