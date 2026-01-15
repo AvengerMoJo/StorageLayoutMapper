@@ -348,7 +348,7 @@ window.onload=updateURL;
                 theEvent.currentTarget.className += " active";
             }
 
-            function updateColorTab(){
+            function updateMetadataTab(){
                 var elements = document.getElementsByClassName('HardDrive');
                 for (var i = 0; i < elements.length; i++) {
                     var element = elements[i];
@@ -359,7 +359,7 @@ window.onload=updateURL;
         </script>
         <button class="tablinks" onclick="switchTab(event, 'Json')">JSON</button>
         <button class="tablinks" onclick="switchTab(event, 'diagrams.net')">diagrams.net</button>
-        <button class="tablinks" onclick="switchTab(event, 'ColorTab');updateColorTab();">Color Change</button>
+        <button class="tablinks" onclick="switchTab(event, 'MetadataTab');updateMetadataTab();">Metadata</button>
         <div id="Json" class="tabview">
             <button onclick="window.jsonview()">JSON-View</button>
             <script>
@@ -383,37 +383,120 @@ window.onload=updateURL;
                 <pre><textarea id="diastring" rows="25" cols="80"></textarea></pre>
             </div>
         </div>
-        <div id="ColorTab" class="tabview">
+        <div id="MetadataTab" class="tabview">
             <button onclick="window.colorchangeview()">ColorChange</button>
             <script>
+                function getOppositeColor(colorName) {
+                    const lightColors = ['white', 'lightblue', 'lightgreen', 'lightyellow', 'lightred', 'cyan', 'lime', 'silver', 'pink'];
+                    const darkColors = ['black', 'blue', 'green', 'red', 'orange', 'purple', 'brown', 'gray', 'teal', 'navy', 'maroon', 'olive', 'magenta'];
+                    
+                    if (lightColors.includes(colorName)) {
+                        return 'black';
+                    } else {
+                        return 'white';
+                    }
+                }
+
                 function colorchangeview() {
-                    color = document.getElementById("HardDriveColor").value;
+                    backgroundColor = document.getElementById("HardDriveColor").value;
                     drive = document.getElementById("HardDriveID").value;
+                    textColor = getOppositeColor(backgroundColor);
+                    
                     if( drive == "All" ) {
                         var elements = document.getElementsByClassName('HardDrive');
                         for (var i = 0; i < elements.length; i++) {
                             var element = elements[i];
-                            element.style.fill = color;
+                            var rect = element.querySelector('rect');
+                            var text = element.querySelector('text');
+                            if (rect) rect.style.fill = backgroundColor;
+                            if (text) text.style.fill = textColor;
                         }
                     } else {
-                      document.getElementById(drive).style.fill = color;
+                      var element = document.getElementById(drive);
+                      if (element) {
+                          var rect = element.querySelector('rect');
+                          var text = element.querySelector('text');
+                          if (rect) rect.style.fill = backgroundColor;
+                          if (text) text.style.fill = textColor;
+                      }
                     }
-                    //document.getElementById( document.getElementById("HardDriveID").value).style.fill = document.getElementById("DriveColor").value;
+                }
+
+                function updateSerialNumber() {
+                    var serialNumber = document.getElementById("SerialNumber").value;
+                    var driveId = document.getElementById("HardDriveID").value;
+
+                    if (driveId === "All") {
+                        updateAllSerials(serialNumber);
+                    } else {
+                        updateSingleSerial(driveId, serialNumber);
+                    }
+                }
+
+                function updateSingleSerial(driveId, serialNumber) {
+                    var element = document.getElementById(driveId);
+                    if (element) {
+                        var title = element.querySelector('title');
+                        if (!title) {
+                            title = SVG().title(serialNumber);
+                            element.add(title);
+                        } else {
+                            title.textContent = serialNumber;
+                        }
+                    }
+                }
+
+                function updateAllSerials(serialNumber) {
+                    var elements = document.getElementsByClassName('HardDrive');
+                    for (var i = 0; i < elements.length; i++) {
+                        var element = elements[i];
+                        var title = element.querySelector('title');
+                        if (!title) {
+                            title = SVG().title(serialNumber);
+                            element.add(title);
+                        } else {
+                            title.textContent = serialNumber;
+                        }
+                    }
                 }
             </script>
             <div id="ColorChangeView" class="menu">
-                <p>Color HD change into:
+                <p>Drive Background Color:
                     <select name="HardDriveColor" id="HardDriveColor">
                         <option value="white">White</option>
+                        <option value="black">Black</option>
+                        <option value="blue">Blue</option>
                         <option value="green">Green</option>
-                        <option value="orange">Orange</option>
                         <option value="red">Red</option>
+                        <option value="yellow">Yellow</option>
+                        <option value="orange">Orange</option>
+                        <option value="purple">Purple</option>
+                        <option value="cyan">Cyan</option>
+                        <option value="magenta">Magenta</option>
+                        <option value="pink">Pink</option>
+                        <option value="brown">Brown</option>
+                        <option value="gray">Gray</option>
+                        <option value="lightblue">Light Blue</option>
+                        <option value="lightgreen">Light Green</option>
+                        <option value="lightyellow">Light Yellow</option>
+                        <option value="lightred">Light Red</option>
+                        <option value="teal">Teal</option>
+                        <option value="navy">Navy</option>
+                        <option value="lime">Lime</option>
+                        <option value="maroon">Maroon</option>
+                        <option value="olive">Olive</option>
+                        <option value="silver">Silver</option>
                     </select>
                 </p>
                 <p>Change Color for HardDrive ID :</p>
                 <select name="HardDriveID" id="HardDriveID">
                     <option value="All">All</option>
                 </select>
+                <hr style="border-color: #555; margin: 20px 0;">
+                <p>Serial Number:
+                    <input type="text" id="SerialNumber" placeholder="e.g., SN12345" style="margin-left: 10px; padding: 5px; width: 200px;">
+                </p>
+                <button onclick="window.updateSerialNumber()">Update Serial</button>
             </div>
         </div>
     </div>

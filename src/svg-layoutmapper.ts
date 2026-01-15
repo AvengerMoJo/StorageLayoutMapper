@@ -17,6 +17,7 @@ declare global {
         diaShapeDraw:any;
         diaShapeHeader:any;
         server_obj:any;
+        updateSerialNumber:any;
     }
 }
 
@@ -41,6 +42,7 @@ window.showShape= showShape;
 window.diaShapeDraw= diaShapeDraw;
 window.diaShapeHeader = diaShapeHeader;
 window.server_obj = server_obj;
+window.updateSerialNumber = updateSerialNumber;
 
 function clear(thedraw:any){
     thedraw.clear();
@@ -130,5 +132,48 @@ function showShape( shapestring: string ){
 
 function diaShapeDraw( theserver: Server){
     showShape(theserver.getShape());
+}
+
+function updateSingleSerial(driveId: string, serialNumber: string){
+    const element = document.getElementById(driveId);
+    if (element) {
+        let title: any = element.querySelector('title');
+        if (!title) {
+            title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+            title.textContent = serialNumber;
+            element.appendChild(title);
+        } else {
+            title.textContent = serialNumber;
+        }
+    }
+}
+
+function updateAllSerials(serialNumber: string){
+    const elements = document.getElementsByClassName('HardDrive');
+    for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        let title: any = element.querySelector('title');
+        if (!title) {
+            title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+            title.textContent = serialNumber;
+            element.appendChild(title);
+        } else {
+            title.textContent = serialNumber;
+        }
+    }
+}
+
+function updateSerialNumber(){
+    const serialNumberInput = document.getElementById("SerialNumber") as HTMLInputElement;
+    const driveIdInput = document.getElementById("HardDriveID") as HTMLSelectElement;
+    
+    const serialNumber = serialNumberInput.value;
+    const driveId = driveIdInput.value;
+
+    if (driveId === "All") {
+        updateAllSerials(serialNumber);
+    } else {
+        updateSingleSerial(driveId, serialNumber);
+    }
 }
 

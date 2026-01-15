@@ -30,6 +30,7 @@ export interface HardDriveConfig {
     height?: number;
     svg?: any;
     shape?: string;
+    serialNumber?: string;
 }
 
 export class HardDrive implements HardDriveConfig {
@@ -41,6 +42,7 @@ export class HardDrive implements HardDriveConfig {
     readonly height?: number;
     svg?: any;
     shape?: any;
+    serialNumber?: string;
 
     constructor(name: string, size:DriveType, orientation?:SlotOrientation, theclass?:string ) {
         var rotation, shapex, shapey;
@@ -78,6 +80,9 @@ export class HardDrive implements HardDriveConfig {
         // this.svg.add( SVG('<harddrive name="' + this.name + '" class="' + this.class_tag + '" type="' + this.size + '" orientation="' + this.orientation + '"\>'));
         this.svg.add( SVG().rect( this.width, this.height ).attr({ stroke: '#000', 'stroke-width': 2}).radius(this.height/5) );
         this.svg.add( SVG().text( this.size + ' ' + this.name ).font({ stroke:"#AAA", fill:"#FFF", strokewidth: "1px", family: 'Helvetica', size: 12}).build(true).move(2,0));
+        const titleElement = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        titleElement.textContent = this.serialNumber || "";
+        this.svg.node.appendChild(titleElement);
         this.svg.addClass( this.class_tag );
         shapex = this.width;
         shapey = this.height;
@@ -104,6 +109,18 @@ export class HardDrive implements HardDriveConfig {
         var match = [ x, y, textx, texty]
         var i = 0;
         return this.shape.replace(/%s/g, ()=>match[i++]);
+    }
+
+    setSerialNumber(serialNumber: string): void {
+        this.serialNumber = serialNumber;
+        const title = this.svg.node.querySelector('title');
+        if (title) {
+            title.textContent = serialNumber;
+        } else {
+            const titleElement = document.createElementNS("http://www.w3.org/2000/svg", "title");
+            titleElement.textContent = serialNumber;
+            this.svg.node.appendChild(titleElement);
+        }
     }
 }
 ;
