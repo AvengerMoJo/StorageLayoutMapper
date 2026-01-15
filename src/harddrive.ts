@@ -74,7 +74,7 @@ export class HardDrive implements HardDriveConfig {
             rotation = 0;
         }
         // this.svg = SVG().group();
-        this.svg = SVG().group("HD", {id: "HD"+this.name});
+        this.svg = SVG().group().attr("id", "HD"+this.name).addClass("HD");
         // this.svg.add( SVG('<harddrive name="' + this.name + '" class="' + this.class_tag + '" type="' + this.size + '" orientation="' + this.orientation + '"\>'));
         this.svg.add( SVG().rect( this.width, this.height ).attr({ stroke: '#000', 'stroke-width': 2}).radius(this.height/5) );
         this.svg.add( SVG().text( this.size + ' ' + this.name ).font({ stroke:"#AAA", fill:"#FFF", strokewidth: "1px", family: 'Helvetica', size: 12}).build(true).move(2,0));
